@@ -75,18 +75,28 @@ class SiteController extends Controller
         return $this->render('login',['login_model'=>$login_model]);
     }
     public function actionPosts(){
-        $dataProvider = new ActiveDataProvider([
-            'query' => Feedback::find()->orderBy('name DESC'),
-        ]);
-        $this->view->title = 'Posts List';
-        return $this->render('posts', ['listDataProvider' => $dataProvider]);
+        if(Yii::$app->user->isGuest){
+            return $this->redirect(['login']);
+        }
+        else {
+            $dataProvider = new ActiveDataProvider([
+                'query' => Feedback::find()->orderBy('name DESC'),
+            ]);
+            $this->view->title = 'Posts List';
+            return $this->render('posts', ['listDataProvider' => $dataProvider]);
+        }
     }
     public function actionUserposts(){
-        $dataProvider = new ActiveDataProvider([
-            'query' => Feedback::find()->where(['user_id'=>Yii::$app->user->identity->id])->orderBy('name DESC'),
-        ]);
-        $this->view->title = 'User posts List';
-        return $this->render('posts', ['listDataProvider' => $dataProvider]);
+        if(Yii::$app->user->isGuest){
+            return $this->redirect(['login']);
+        }
+        else {
+            $dataProvider = new ActiveDataProvider([
+                'query' => Feedback::find()->where(['user_id' => Yii::$app->user->identity->id])->orderBy('name DESC'),
+            ]);
+            $this->view->title = 'User posts List';
+            return $this->render('posts', ['listDataProvider' => $dataProvider]);
+        }
     }
 
 }
