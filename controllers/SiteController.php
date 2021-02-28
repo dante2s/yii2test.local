@@ -6,6 +6,8 @@ use Yii;
 use yii\web\Controller;
 use app\models\Signup;
 use app\models\Login;
+use app\models\Feedback;
+use yii\data\ActiveDataProvider;
 
 class SiteController extends Controller
 {
@@ -14,7 +16,23 @@ class SiteController extends Controller
             return $this->redirect(['login']);
         }
         else {
-            return $this->render('index');
+            $model = new Feedback();
+            $model->user_id = Yii::$app->user->identity->id;
+            if ($model->load(Yii::$app->request->post())) {
+                if ($model->save()) {
+                    Yii::$app->session->setFlash(
+                        'success',
+                        true
+                    );
+                    return $this->refresh();
+                } else {
+                    Yii::$app->session->setFlash(
+                        'success',
+                        false
+                    );
+                }
+            }
+            return $this->render('index', ['model' => $model]);
         }
     }
     public function actionLogout()
@@ -55,6 +73,20 @@ class SiteController extends Controller
         }
 
         return $this->render('login',['login_model'=>$login_model]);
+    }
+    public function actionPosts(){
+        $dataProvider = new ActiveDataProvider([
+            'query' => Feedback::find()->orderBy('name DESC'),
+        ]);
+        $this->view->title = 'Posts List';
+        return $this->render('posts', ['listDataProvider' => $dataProvider]);
+    }
+    public function actionUserposts(){
+        $dataProvider = new ActiveDataProvider([
+            'query' => Feedback::find()->where(['user_id'=>Yii::$app->user->identity->id])->orderBy('name DESC'),
+        ]);
+        $this->view->title = 'User posts List';
+        return $this->render('userposts', ['listDataProvider' => $dataProvider]);
     }
 
 }
