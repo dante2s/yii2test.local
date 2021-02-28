@@ -86,7 +86,7 @@ class SiteController extends Controller
             'query' => Feedback::find()->where(['user_id'=>Yii::$app->user->identity->id])->orderBy('name DESC'),
         ]);
         $this->view->title = 'User posts List';
-        return $this->render('userposts', ['listDataProvider' => $dataProvider]);
+        return $this->render('posts', ['listDataProvider' => $dataProvider]);
     }
 
 }
